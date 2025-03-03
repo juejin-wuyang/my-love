@@ -1,0 +1,828 @@
+[
+  {
+    "title": "画布 1",
+    "topic": {
+      "title": "网络编程 socket ",
+      "topics": [
+        {
+          "title": "淘气三千问",
+          "topics": [
+            {
+              "title": "localhost, 127.0.0.1, 0.0.0.0  的区别",
+              "topics": [
+                {
+                  "title": "0.0.0.0 不能ping通，代表本机所有的IP地址",
+                  "topics": [
+                    {
+                      "title": "如果监听0.0.0.0 无论是通过127.0.0.1 & 10.1.xxx.xxx都可以访问该socket"
+                    },
+                    {
+                      "title": "等同于IP_ADDR_ANY"
+                    }
+                  ]
+                },
+                {
+                  "title": "示例区别",
+                  "topics": [
+                    {
+                      "title": "0.0.0.0:9999 外部可以通过本机ip访问，这种方式最是保险 "
+                    },
+                    {
+                      "title": "192.168.0.105:9999 外部可以通过这个ip访问9999 "
+                    },
+                    {
+                      "title": "127.0.0.1：9999这种方式外部访问不了，本机可以访问"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "如何进行udp socket编程"
+            },
+            {
+              "title": "tomcat 如果本机多个ip,如何监听.",
+              "topics": [
+                {
+                  "title": "INADDR_ANY",
+                  "topics": [
+                    {
+                      "title": "指定监听这个, 就会同时监听本地所有网卡,所有IP."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "如何优雅关闭socket"
+            },
+            {
+              "title": "socket 客户端发送 数据, 如何选择ip 或者网卡? 同一个网桥下,能否被分配两个ip",
+              "topics": [
+                {
+                  "title": "可以通过虚拟网卡分配其他ip, mac地址也不同."
+                },
+                {
+                  "title": "客户端发送数据时, 操作系统会根据本地路由表 选择目的地址对应的源ip是谁."
+                }
+              ]
+            },
+            {
+              "title": "什么是backlog"
+            },
+            {
+              "title": "客户端连接服务端出现connection refused. 和socket函数有啥关系",
+              "topics": [
+                {
+                  "title": "如果没有进程在该端口上调用listen 监听该端口. 就会出现refused"
+                }
+              ]
+            },
+            {
+              "title": "客户端连接出现connection timeout",
+              "topics": [
+                {
+                  "title": "已经listen了,但是没有及时accept"
+                }
+              ]
+            },
+            {
+              "title": "listen 和bind的区别 .",
+              "topics": [
+                {
+                  "title": "listen",
+                  "topics": [
+                    {
+                      "title": "创建半连接队列的实例，初始化全连接队列。"
+                    },
+                    {
+                      "title": "初始化sock的一些变量，把它的状态设为TCP_LISTEN。"
+                    },
+                    {
+                      "title": "检查端口是否可用，防止bind()后其它进程修改了端口信息。"
+                    },
+                    {
+                      "title": "把sock链接进入监听哈希表listening_hash中"
+                    }
+                  ]
+                },
+                {
+                  "title": "bind",
+                  "topics": [
+                    {
+                      "title": "该调用通过传递进来的文件描述符找到对应的socket, 结构，然后通过socket访问sock结构。操作sock进行地址的绑定。如果指定了端口检查端口的可用性并绑定，否则随机分配一个端口进行绑定"
+                    }
+                  ]
+                },
+                {
+                  "title": "udp的服务端 只需要bind,不需要listen"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "TCP  套接字编程基础",
+          "topics": [
+            {
+              "title": "服务端网络编程模型",
+              "topics": [
+                {
+                  "title": "tcp调用顺序",
+                  "topics": [
+                    {
+                      "title": "int socket(int domain, int type, protocol)",
+                      "topics": [
+                        {
+                          "title": "指定socket的协议. (可创建tcp, udp等)"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "int bind(int socketfd, struct sockaddr *  addr, socklen_t addrlen);",
+                      "topics": [
+                        {
+                          "title": "addr, 用来作为输入参数, 提供服务端绑定的地址.端口"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "listen(int sockfd, int backlog);",
+                      "topics": [
+                        {
+                          "title": "指定tcp连接的backlog"
+                        },
+                        {
+                          "title": "backlog 指定的是处于Established状态的tcp连接的个数.而不是处于syn状态的tcp连接. syn和establish两个状态分别在两个队列, 此backlog 是establish状态的连接的队列长度. "
+                        },
+                        {
+                          "title": "SYN RECEIVED队列长度 由linux系统参数指定. 不能针对一个socket 设置. ",
+                          "topics": [
+                            {
+                              "title": "/proc/sys/net/ipv4/tcp_max_syn_backlog 默认值128"
+                            }
+                          ]
+                        },
+                        {
+                          "title": "accept只是从establish状态的队列取出连接."
+                        },
+                        {
+                          "title": "如果accept队列满了, 不会再将其他连接置为establish状态, 即使该连接已经接收到sync ack. (此时客户端认为已经建立成功,就会出现read timeout.客户端认为连接已经建立,所以不会是connect timeout)",
+                          "makers": [
+                            "priority-1",
+                            "task-done",
+                            "flag-red"
+                          ]
+                        },
+                        {
+                          "title": "https://blog.csdn.net/yangbodong22011/article/details/60399728"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "int accept(int sockfd, struct sockaddr * addr, socklen_t * addrlen);",
+                      "topics": [
+                        {
+                          "title": "addr 作为输出参数, 输出客户端地址信息"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "客户端编程模型",
+              "topics": [
+                {
+                  "title": "调用顺序",
+                  "topics": [
+                    {
+                      "title": "int connect(int sockfd, struct sockaddr * addr, socklen_t addrlen);",
+                      "topics": [
+                        {
+                          "title": "connect在三次握手后 返回, 也就是服务端已经收到ack了.
+进入establish, 或者即将进入establish.",
+                          "topics": [
+                            {
+                              "title": "可能 backlog满了,这样已经收到ack的无法进入establish队列"
+                            }
+                          ]
+                        },
+                        {
+                          "title": "客户端地址何时分配, 如何分配",
+                          "topics": [
+                            {
+                              "title": "发送方本地有路由表 标识每个网卡的下一跳路由地址. 通过子网掩码得出下一跳地址."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "常见流程",
+              "topics": [
+                {
+                  "title": "服务端建立监听 监听请求. "
+                },
+                {
+                  "title": "客户端申请连接"
+                },
+                {
+                  "title": "收发数据."
+                },
+                {
+                  "title": "应用层沟通 何时关闭(接收到关闭报文)"
+                },
+                {
+                  "title": "双方close"
+                }
+              ]
+            },
+            {
+              "title": "协议及套接字类型",
+              "topics": [
+                {
+                  "title": "socket 中domain, type, protocol",
+                  "topics": [
+                    {
+                      "title": "domain 指定ip层通讯使用的 协议族. 可选有 PF_INET(IPv4协议), PF_INET6,PF_IPX, PF_PACKET (底层套接字协议族)"
+                    },
+                    {
+                      "title": "套接字type",
+                      "topics": [
+                        {
+                          "title": "套接字的传输方式."
+                        },
+                        {
+                          "title": "面向连接套接字类型",
+                          "topics": [
+                            {
+                              "title": "SOCK_STREAM"
+                            },
+                            {
+                              "title": "当前只存在tcp一种, 如果基于流, 可能会有tcp的替代方案"
+                            }
+                          ]
+                        },
+                        {
+                          "title": "面向消息的套接字",
+                          "topics": [
+                            {
+                              "title": "SOCK_DGRAM"
+                            },
+                            {
+                              "title": "只有udp一种. "
+                            }
+                          ]
+                        },
+                        {
+                          "title": "面向消息和连接的区别",
+                          "topics": [
+                            {
+                              "title": "客户端和服务端 在对待流时, 是需要维护连接状态的."
+                            },
+                            {
+                              "title": "流是没有分割点的, 读取方可以不停读取, 需要自己分割 流."
+                            },
+                            {
+                              "title": "面向连接在传输时, 能保证消息不丢, 不重复, 有序."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "title": "protocol ",
+                      "topics": [
+                        {
+                          "title": "OPPROTO_TCP"
+                        },
+                        {
+                          "title": "OPPROTO_UDP"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "这三个参数是相互关联的, 例如type选定后, protocol就需要设置匹配的协议. "
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "nagle算法",
+          "topics": [
+            {
+              "title": "profile",
+              "topics": [
+                {
+                  "title": "Nagle算法的基本定义是任意时刻，最多只能有一个未被确认的小段。所谓“小段”，指的是小于MSS尺寸的数据块，所谓“未被确认”，是指一个数据块发送出去后，没有收到对方发送的ACK确认该数据已收到"
+                },
+                {
+                  "title": "Nagle算法只允许一个未被ACK的包存在于网络，它并不管包的大小，因此它事实上就是一个扩展的停-等协议（停止等待ARQ协议），只不过它是基于包停-等的，而不是基于字节停-等的。Nagle算法完全由TCP协议的ACK机制决定，这会带来一些问题，比如如果对端ACK回复很快的话，Nagle事实上不会拼接太多的数据包，虽然避免了网络拥塞，网络总体的利用率依然很低。"
+                },
+                {
+                  "title": "发送端需要连续发送5个写操作（应用程序将数据写入到缓冲池的动作）的小报文，首先发送第一个，由于Nagle算法的作用，在未收到第一个报文确认前，发送端在等待写操作的同时进行读操作，接收端并未启用延迟确认（视TCP delay ACK时间为0），尽管刚收到该报文就发出确认，但由于网络延时的原因，在收集齐另外4个小报文后，发送方才收到了第一个报文的ACK，则后面的4个报文会一起发送出去（大小未超过MSS），接收端再次ACK。",
+                  "topics": [
+                    {
+                      "title": "示例"
+                    }
+                  ]
+                },
+                {
+                  "title": "nagle算法在处理多次write 发送的小报文时,有优化作用. 和延迟 ack没关系"
+                }
+              ]
+            },
+            {
+              "title": "该算法规则",
+              "topics": [
+                {
+                  "title": "（1）如果包长度达到MSS，则允许发送；
+（2）如果该包含有FIN，则允许发送；
+（3）设置了TCP_NODELAY选项，则允许发送；
+（4）未设置TCP_CORK选项时，若所有发出去的小数据包（包长度小于MSS）均被确认，则允许发送；
+（5）上述条件都未满足，但发生了超时（一般为200ms），则立即发送。"
+                }
+              ]
+            },
+            {
+              "title": "适用模型",
+              "topics": [
+                {
+                  "title": "write-read-write-read模式",
+                  "topics": [
+                    {
+                      "title": "即client-> write 发送后, read等待server端的数据到来. server端会将数据和ack一起发送
+client read后,继续write 处理数据."
+                    }
+                  ]
+                },
+                {
+                  "title": "默认打开NAGLE, dalay ack. 是因为这个模式居多"
+                }
+              ]
+            },
+            {
+              "title": "不适用模型",
+              "topics": [
+                {
+                  "title": "write-write-read模式",
+                  "topics": [
+                    {
+                      "title": "这种场景业务逻辑层进行了分包，也就是说B端要等到A端的2个write包到达才会响应，例如爬虫把HTTP Header和Body分开发送。下面来模拟这一模式，A端第1次write，数据被立刻发送出去，第2次write因为第1次的包的Ack还没回来，被缓存了下来等待Ack，这一等很可能就是40ms甚至200ms。那B端为什么迟迟不回Ack呢？因为Ack包也被缓存下来了，准备等A端的2次write到齐了连同响应数据一起发回A端"
+                    },
+                    {
+                      "title": "server端可能开启了dalay ack机制. server会将ack和要发送的数据一起发送.但是如果不满足就会一直等待. 但是恰好发送端 在没有收到ack时, 不会发送下一份数据.所以此时存在了 无效的等待问题"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "TCP_NODALAY",
+              "topics": [
+                {
+                  "title": "默认开启, 关闭该参数, 只是关闭了NAGLE 算法, dalay ack不受影响"
+                }
+              ]
+            },
+            {
+              "title": "如下场景考虑关闭Nagle算法：",
+              "topics": [
+                {
+                  "title": "(1) 对端不向本端发送数据，并且对延时比较敏感的操作；这种操作没法捎带ack；",
+                  "topics": [
+                    {
+                      "title": "大文件上传下载"
+                    }
+                  ]
+                },
+                {
+                  "title": "(2) 如上写-写-读操作；对于此种情况，优先使用其他方式，而不是关闭Nagle算法：
+
+--使用writev，而不是两次调用write，单个writev调用会使tcp输出一次而不是两次，只产生一个tcp分节，这是首选方法；
+
+--把两次写操作的数据复制到单个缓冲区，然后对缓冲区调用一次write；
+
+--关闭Nagle算法，调用write两次；有损于网络，通常不考虑；"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Dalay Ack算法",
+          "topics": [
+            {
+              "title": "profile",
+              "topics": [
+                {
+                  "title": " delay ack是指收到包后不立即ack，而是等一小会（比如40毫秒）看看，
+如果这40毫秒以内正好有一个包（比如上面的http response）发给client，那么我这个ack包就跟着发过去
+如果40毫秒 内没有包要发送, 也会ack"
+                },
+                {
+                  "title": "当协议栈接受到TCP数据时，并不一定会立刻发送ACK响应，而是倾向于等待一个超时或者满足特殊条件时再发送。对于Linux实现，这些特殊条件如下：
+1）收到的数据已经超过了full frame size
+2）或者处于快速回复模式
+3）或者出现了乱序的包
+4）或者接收窗口的数据足够多
+如果接收方有数据回写，则ACK也会搭车一起发送。当以上条件都不满足时，接收方会延迟40ms再回应ACK。",
+                  "makers": [
+                    "task-done",
+                    "priority-1",
+                    "star-red"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "套接字参数",
+          "topics": [
+            {
+              "title": "套接字可选项目",
+              "topics": [
+                {
+                  "title": "SOL_SOCKET 层"
+                },
+                {
+                  "title": "IPPROTO_IP"
+                },
+                {
+                  "title": "IPPROTO_TCP"
+                },
+                {
+                  "title": "套接字是分层的. "
+                }
+              ]
+            },
+            {
+              "title": "设置获取套接字参数",
+              "topics": [
+                {
+                  "title": "getsocketopt(int sock, int level, int optname, void * optval, socklen_t * optlen)"
+                },
+                {
+                  "title": "setsocketopt(int sock, int level, int optname, const void * optval, socklen_t * optlen)"
+                },
+                {
+                  "title": "在socket方法创建完sock后"
+                }
+              ]
+            },
+            {
+              "title": "设置缓冲区大小",
+              "topics": [
+                {
+                  "title": "so_SNDBUF",
+                  "topics": [
+                    {
+                      "title": "发送缓冲区"
+                    }
+                  ]
+                },
+                {
+                  "title": "SO_RCVBUF",
+                  "topics": [
+                    {
+                      "title": "接受缓冲区"
+                    }
+                  ]
+                },
+                {
+                  "title": "接收缓冲区的最大值是8M，发送缓冲区的最大值是16M",
+                  "topics": [
+                    {
+                      "title": "默认值发送160k, 接受80k"
+                    }
+                  ]
+                },
+                {
+                  "title": "https://www.cnblogs.com/zengkefu/p/5749009.html",
+                  "topics": [
+                    {
+                      "title": "tcp参数设置"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "so_reuseaddr",
+              "topics": [
+                {
+                  "title": "设置该值将保证socket处于timewait状态也能被分配出去.
+否则该端口绑定时会出错"
+                }
+              ]
+            },
+            {
+              "title": "tcp_nodelay",
+              "topics": [
+                {
+                  "title": "是否禁用nagle算法"
+                },
+                {
+                  "title": "nagle算法",
+                  "makers": [
+                    "priority-1",
+                    "task-done"
+                  ],
+                  "topics": [
+                    {
+                      "title": "该算法优化网络流量, 当发送缓冲区的数据 到来比较缓慢时, tcp并不会没到来一个字节发送一次, 而是等到服务端ack的时候,再发送数据, 这样延迟的时间就能等待更多的数据到达发送缓冲区"
+                    },
+                    {
+                      "title": "如果发送缓冲区一直比较慢, 就数据传输量一直很大, 则因该禁用该算法, 该算法默认开启"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": null,
+              "topics": [
+                {
+                  "title": null
+                }
+              ]
+            },
+            {
+              "title": "[Image]"
+            },
+            {
+              "title": "net.ipv4.tcp_syncookies",
+              "topics": [
+                {
+                  "title": "默认值：1
+# 作用：是否打开SYN Cookie功能，该功能可以防止部分SYN攻击"
+                }
+              ]
+            },
+            {
+              "title": "net.ipv4.ip_local_port_range = 1024  65535",
+              "topics": [
+                {
+                  "title": " 默认值：32768   61000
+# 作用：可用端口的范围"
+                }
+              ]
+            },
+            {
+              "title": "# 默认值：0"
+            },
+            {
+              "title": "# 作用：针对TIME-WAIT，做为客户端可以启用（例如，作为nginx-proxy前端代理，要访问后端的服务）"
+            },
+            {
+              "title": "net.ipv4.tcp_tw_reuse = 1",
+              "topics": [
+                {
+                  "title": "# 作用：针对TIME-WAIT，做为客户端可以启用（例如，作为nginx-proxy前端代理，要访问后端的服务）
+net.ipv4.tcp_tw_reuse = 1",
+                  "topics": [
+                    {
+                      "title": "默认关闭"
+                    }
+                  ]
+                },
+                {
+                  "title": "net.ipv4.tcp_max_tw_buckets = 5000",
+                  "topics": [
+                    {
+                      "title": "表示系统同时保持TIME_WAIT套接字的最大数量，如果超过这个数字，TIME_WAIT套接字将立刻被清除并打印警告信息。默认为180000。设为较小数值此项参数可以控制TIME_WAIT套接字的最大数量，避免服务器被大量的TIME_WAIT套接字拖死。"
+                    }
+                  ]
+                },
+                {
+                  "title": "net.ipv4.tcp_tw_recycle = 1",
+                  "topics": [
+                    {
+                      "title": "表示开启TCP连接中TIME-WAIT sockets的快速回收,默认为0,表示关闭"
+                    }
+                  ]
+                },
+                {
+                  "title": "net.ipv4.tcp_max_tw_buckets = 180000",
+                  "topics": [
+                    {
+                      "title": "表示系统同时保持TIME_WAIT套接字的最大数量,如果超过这个数字,TIME_WAIT套接字将立刻被清除并打印警告信息"
+                    },
+                    {
+                      "title": "#默认为180000,建议使用默认值,不建议调小"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "三次握手",
+              "topics": [
+                {
+                  "title": "tcp_syn_retries",
+                  "topics": [
+                    {
+                      "title": "对于一个新建连接，内核要发送多少个 SYN 连接请求才决定放弃。不应该大于255，默认值是5，对应于180秒左右时间。。(对于大负载而物理通信良好的网络而言,这个值偏高,可修改为2.这个值仅仅是针对对外的连接,对进来的连接,是由tcp_retries1决定的)"
+                    },
+                    {
+                      "title": "默认值  5"
+                    }
+                  ]
+                },
+                {
+                  "title": "tcp_synack_retries",
+                  "topics": [
+                    {
+                      "title": "对于远端的连接请求SYN，内核会发送SYN ＋ ACK数据报，以确认收到上一个 SYN连接请求包。这是所谓的三次握手( threeway handshake)机制的第二个步骤。这里决定内核在放弃连接之前所送出的 SYN+ACK 数目。不应该大于255，默认值是5，对应于180秒左右时间"
+                    },
+                    {
+                      "title": "默认值5"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "tcp_keepalive_time",
+              "topics": [
+                {
+                  "title": "TCP发送keepalive探测消息的间隔时间（秒），用于确认TCP连接是否有效。防止两边建立连接但不发送数据的攻击, 默认值  7200"
+                },
+                {
+                  "title": "tcp_keepalive_probes",
+                  "topics": [
+                    {
+                      "title": "TCP发送keepalive探测消息的间隔时间（秒），用于确认TCP连接是否有效。"
+                    },
+                    {
+                      "title": "默认值 9"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "tcp_retries1",
+              "topics": [
+                {
+                  "title": "放弃回应一个TCP连接请求前﹐需要进行多少次重试。RFC 规定最低的数值是3"
+                },
+                {
+                  "title": "这个指外部请求进来, 发送sync 多次之后, 才放弃继续回应.(可能是发送RESET .)"
+                }
+              ]
+            },
+            {
+              "title": "tcp_retries2",
+              "topics": [
+                {
+                  "title": "在丢弃激活(已建立通讯状况)的TCP连接之前﹐需要进行多少次重试。默认值为15，根据RTO的值来决定，相当于13-30分钟(RFC1122规定，必须大于100秒).(这个值根据目前的网络设置,可以适当地改小,我的网络内修改为了5)"
+                },
+                {
+                  "title": "TCP失败重传次数,默认值15,意味着重传15次才彻底放弃.可减少到5,以尽早释放内核资源"
+                },
+                {
+                  "title": "tcp并不是无限次的超时重发"
+                }
+              ]
+            },
+            {
+              "title": "net.ipv4.tcp_max_orphans = 131072",
+              "topics": [
+                {
+                  "title": "系统所能处理不属于任何进程的TCP sockets最大数量。假如超过这个数量，那么不属于任何进程的连接会被立即reset，并同时显示警告信息。之所以要设定这个限制﹐纯粹为了抵御那些简单的 DoS 攻击﹐千万不要依赖这个或是人为的降低这个限制，更应该增加这个值(如果增加了内存之后)。每个孤儿套接字最多能够吃掉你64K不可交换的内存。",
+                  "topics": [
+                    {
+                      "title": "增加这个值是因为 内存增加后, socekt支持句柄数也可以增加. 但是close后的socket受这个值的限制. 在高并发场景下,需要增加这个值"
+                    }
+                  ]
+                },
+                {
+                  "title": "进程调用close关闭这个socket后, 该socket并不是立即回收, 但是与进程已经无关了, 变成孤儿socket"
+                }
+              ]
+            },
+            {
+              "title": "net.ipv4.tcp_fin_timeout ",
+              "topics": [
+                {
+                  "title": "表示如果套接字由本端要求关闭,这个参数决定了它保持在FIN-WAIT-2状态的时间"
+                }
+              ]
+            },
+            {
+              "title": "/proc/sys/net/ipv4/tcp_abort_on_overflow"
+            },
+            {
+              "title": " /proc/sys/net/ipv4/ip_default_ttl",
+              "topics": [
+                {
+                  "title": "该文件表示一个数据报的生存周期（Time To Live），即最多经过多少路由器。
+缺省设置：64  增加该值会降低系统性能。"
+                }
+              ]
+            },
+            {
+              "title": " /proc/sys/net/ipv4/tcp_abort_on_overflow",
+              "topics": [
+                {
+                  "title": "当守护进程太忙而不能接受新的连接，就向对方发送reset消息，默认值是false。这意味着当溢出的原因是因为一个偶然的猝发，那么连接将恢复状态。只有在你确信守护进程真的不能完成连接请求时才打开该选项，该选项会影响客户的使用。"
+                }
+              ]
+            },
+            {
+              "title": "/proc/sys/net/ipv4/tcp_sack",
+              "topics": [
+                {
+                  "title": "该文件表示是否启用有选择的应答（Selective Acknowledgment），这可以通过有选择地应答乱序接收到的报文来提高性能（这样可以让发送者只发送丢失的报文段）；（对于广域网通信来说）这 个选项应该启用，但是这会增加对 CPU 的占用。"
+                },
+                {
+                  "title": "默认启用"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "udp编程",
+          "topics": [
+            {
+              "title": "bind",
+              "topics": [
+                {
+                  "title": "客户端和服务端都需要bind . 只要需要recv数据都需要bind, 指定socket 从哪个ip, 端口接受数据"
+                }
+              ]
+            },
+            {
+              "title": "connect",
+              "topics": [
+                {
+                  "title": "connect是可选项, 因为sentto可以指定目的ip, 端口 .所以一般不需要connect指定目标ip, port.
+但是sentto中默认了一个绑定目标IP,port的行为, 如果使用connect 可以指定绑定. 当长时间和某一个目的ip,端口通讯时可以使用connect优化这个问题"
+                },
+                {
+                  "title": "和tcp中的connect的区别",
+                  "topics": [
+                    {
+                      "title": "tcp中的connect会三次握手, 而udp的connect只会注册socket到目标ip,port. "
+                    },
+                    {
+                      "title": "udp connect后, 可以使用write写socket, 而不用sendto指定ip,port"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "如何获取对端的ip,port",
+              "topics": [
+                {
+                  "title": "recv的时候,可获取对方的ip,port"
+                }
+              ]
+            },
+            {
+              "title": "udp",
+              "topics": [
+                {
+                  "title": "是有边界的消息服务, 即对方sendto的次数和recv的次数完全相同."
+                },
+                {
+                  "title": "不存在像tcp那样, 流数据, 没有边界, 需要客户端自己定义边界."
+                }
+              ]
+            },
+            {
+              "title": "适合使用udp的服务",
+              "topics": [
+                {
+                  "title": "dns"
+                },
+                {
+                  "title": "视频服务等",
+                  "topics": [
+                    {
+                      "title": "丢失几帧数据不影响"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "structure": "org.xmind.ui.map.unbalanced"
+  }
+]

@@ -1,0 +1,255 @@
+[
+  {
+    "title": "画布 1",
+    "topic": {
+      "title": "Elastic-Search使用",
+      "topics": [
+        {
+          "title": "参考",
+          "topics": [
+            {
+              "title": "https://mp.weixin.qq.com/s/nKt3NWVG9Gcr-tR48rJpOw",
+              "topics": [
+                {
+                  "title": "搜索引擎选开源的 ElasticSearch 还是商业的 Splunk"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "淘气三千问",
+          "topics": [
+            {
+              "title": "keyword 和 text 的区别",
+              "topics": [
+                {
+                  "title": "Text：会分词，然后进行索引
+       不支持聚合",
+                  "topics": [
+                    {
+                      "title": "用于存储全文搜索数据, 例如: 邮箱内容、地址、代码块、博客文章内容等。"
+                    },
+                    {
+                      "title": "默认结合standard analyzer(标准解析器)对文本进行分词、倒排索引。"
+                    },
+                    {
+                      "title": "默认结合标准分析器进行词命中、词频相关度打分"
+                    }
+                  ]
+                },
+                {
+                  "title": "keyword：不进行分词，直接索引
+       支持模糊、精确查询
+       支持聚合",
+                  "topics": [
+                    {
+                      "title": "用于存储邮箱号码、手机号码、主机名、状态码、邮政编码、标签、年龄、性别等数据。"
+                    },
+                    {
+                      "title": "用于筛选数据(例如: select * from x where status='open')、排序、聚合(统计)。"
+                    },
+                    {
+                      "title": "直接将完整的文本保存到倒排索引中。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "tip 提示",
+          "topics": [
+            {
+              "title": "term 查询是包含查询, 并不是严格相等查询, 如果一个字分词了, 即使完全匹配可能也可能查不出来, 因为没有命中任何一个分词."
+            }
+          ]
+        },
+        {
+          "title": "全文搜索"
+        },
+        {
+          "title": "结构化搜索",
+          "topics": [
+            {
+              "title": "范围",
+              "topics": [
+                {
+                  "title": "range ",
+                  "topics": [
+                    {
+                      "title": ""range" : {
+ 	"price" : {
+        "gte" : 20,
+        "lte" : 40
+    }
+}"
+                    }
+                  ]
+                },
+                {
+                  "title": "日期范围",
+                  "topics": [
+                    {
+                      "title": " "gt" : "now-1h""
+                    },
+                    {
+                      "title": ""gt" : "2014-01-01 00:00:00",
+ "lt" : "2014-01-01 00:00:00||+1M" "
+                    },
+                    {
+                      "title": "支持一些计算"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "精确值查找",
+              "topics": [
+                {
+                  "title": "处理数字（numbers）、布尔值（Booleans）、日期（dates"
+                }
+              ]
+            },
+            {
+              "title": "term 查询",
+              "topics": [
+                {
+                  "title": ""term" : { 
+                    "price" : 20
+                }"
+                },
+                {
+                  "title": "使用倒排索引方式查询, 对于数字, 日期,bool 能精确匹配,对于 文本由于文本会分词, 非精确匹配"
+                },
+                {
+                  "title": "如果想使用对text 使用精确匹配,必须对 text在创建索引时 ,指定不进行分词",
+                  "topics": [
+                    {
+                      "title": "  "productID" : {
+                    "type" : "string",
+                    "index" : "not_analyzed" 
+                }"
+                    }
+                  ]
+                },
+                {
+                  "title": "非精确查找, 当查询的term 字段是 list 时, 匹配条件是包含而非 精确等于",
+                  "topics": [
+                    {
+                      "title": "{ "tags" : ["search"] }
+{ "tags" : ["search", "open_source"] } 
+
+{ "term" : { "tags" : "search" } }
+",
+                      "topics": [
+                        {
+                          "title": "[Image]"
+                        },
+                        {
+                          "title": "倒排索引表"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "它会与以下两个文档 同时 匹配："
+                    },
+                    {
+                      "title": "倒排索引会对字段进行分词. 当然分词时会考虑字段类型. 倒排索引 处理 tags 为list,会建立两个索引记录"
+                    },
+                    {
+                      "title": "由于倒排索引表自身的特性，整个字段是否相等会难以计算，如果确定某个特定文档是否 只（only） 包含我们想要查找的词呢？首先我们需要在倒排索引中找到相关的记录并获取文档 ID，然后再扫描 倒排索引中的每行记录 ，查看它们是否包含其他的 terms 。
+
+可以想象，这样不仅低效，而且代价高昂。正因如此， term 和 terms 是 必须包含（must contain） 操作，而不是 必须精确相等（must equal exactly）",
+                      "topics": [
+                        {
+                          "title": "这种方式非常低效."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "terms 查询 指定一个待查list, 当字段中包含 list 中任何一个,即命中这个记录"
+                }
+              ]
+            },
+            {
+              "title": "基于term 实现精确等于查询",
+              "topics": [
+                {
+                  "title": "如果一定期望得到我们前面说的那种行为（即整个字段完全相等），最好的方式是增加并索引另一个字段， 这个字段用以存储该字段包含词项的数量，同样以上面提到的两个文档为例，现在我们包括了一个维护标签数的新字段："
+                },
+                {
+                  "title": "[Image]"
+                },
+                {
+                  "title": "使用这个查询",
+                  "topics": [
+                    {
+                      "title": "[Image]"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "bool 过滤器",
+              "topics": [
+                {
+                  "title": "must",
+                  "topics": [
+                    {
+                      "title": "所有的语句都 必须（must） 匹配，与 AND 等价。"
+                    }
+                  ]
+                },
+                {
+                  "title": "must-not",
+                  "topics": [
+                    {
+                      "title": "所有的语句都 不能（must not） 匹配，与 NOT 等价。",
+                      "topics": [
+                        {
+                          "title": "[Image]"
+                        },
+                        {
+                          "title": "也可以指定多个 term. 中间默认使用 and 连接"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "should",
+                  "topics": [
+                    {
+                      "title": "至少有一个语句要匹配，与 OR 等价。"
+                    },
+                    {
+                      "title": "should 语句中理论上最少有两个子条件"
+                    }
+                  ]
+                },
+                {
+                  "title": "示例",
+                  "topics": [
+                    {
+                      "title": "[Image]"
+                    },
+                    {
+                      "title": "[Image]"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "structure": "org.xmind.ui.map.unbalanced"
+  }
+]
